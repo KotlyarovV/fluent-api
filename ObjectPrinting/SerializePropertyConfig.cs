@@ -15,6 +15,11 @@ namespace ObjectPrinting
             UsingPropertyInfo = property;
         }
 
+        /// <summary>
+        /// set serialization function for property
+        /// </summary>
+        /// <param name="func">serialization function</param>
+        /// <returns>configured printingconfig</returns>
         public PrintingConfig<TOwner> Using(Func<TType, string> func)
         {
             PrintingConfig.SpecialProperties.Add(UsingPropertyInfo, func);

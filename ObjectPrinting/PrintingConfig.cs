@@ -7,8 +7,17 @@ using System.Text;
 
 namespace ObjectPrinting
 {
+    /// <summary>
+    /// Class for defining configurations of serialization
+    /// </summary>
+    /// <typeparam name="TOwner"></typeparam>
     public class PrintingConfig<TOwner>
     {
+        /// <summary>
+        /// Serialize object
+        /// </summary>
+        /// <param name="obj">object</param>
+        /// <returns>serialization un string</returns>
         public string PrintToString(TOwner obj)
         {
             return PrintToString(obj, 0);
@@ -29,13 +38,24 @@ namespace ObjectPrinting
         private string GetSerializaryonByProperty(PropertyInfo key, object obj) => 
             (string) SpecialProperties[key].DynamicInvoke(new object[] { key.GetValue(obj) });
 
-
+        /// <summary>
+        /// Exclude type from serialization
+        /// </summary>
+        /// <typeparam name="TType">Excluded type</typeparam>
+        /// <returns>printing configuration with excluded type</returns>
         public PrintingConfig<TOwner> ExcludeType<TType>()
         {
             exludedTypes.Add(typeof(TType));
             return this;
         }
 
+        /// <summary>
+        /// Exclude property which defined in fuction from serialization
+        /// As example (x => x.Name) exclude name
+        /// </summary>
+        /// <typeparam name="T">Type of excluded property</typeparam>
+        /// <param name="memberSelector">excluded property</param>
+        /// <returns>printing configuration with excluded property</returns>
         public PrintingConfig<TOwner> ExcludeProperty<T>(Expression<Func<TOwner, T>> memberSelector)
         {
             var propertyInfo = (PropertyInfo)((MemberExpression)memberSelector.Body).Member;
@@ -43,19 +63,34 @@ namespace ObjectPrinting
             return this;
         }
 
+        /// <summary>
+        /// Choosing property for configuration
+        /// </summary>
+        /// <typeparam name="T">Type of peoperty for configuration</typeparam>
+        /// <param name="memberSelector">func returns property</param>
+        /// <returns>configuration for using property</returns>
         public SerializePropertyConfig<TOwner, T> Printing<T>(
             Expression<Func<TOwner, T>> memberSelector)
         {
-            var propertyInfo = (PropertyInfo)((MemberExpression) memberSelector.Body).Member;
-            
-            return   new SerializePropertyConfig<TOwner, T>(this, propertyInfo);
+            var propertyInfo = (PropertyInfo)((MemberExpression) memberSelector.Body).Member;    
+            return new SerializePropertyConfig<TOwner, T>(this, propertyInfo);
         }
 
+        /// <summary>
+        /// Choosing numeric type for setting culture
+        /// </summary>
+        /// <typeparam name="TType">numeric type</typeparam>
+        /// <returns>configuration for using culture in numeric type</returns>
         public SerializeConfig<TOwner, TType> ForNumericType<TType>()
         {
             return new SerializeConfig<TOwner, TType>(this);
         }
 
+        /// <summary>
+        /// Choosing type for configuration
+        /// </summary>
+        /// <typeparam name="TType">Type for configuration</typeparam>
+        /// <returns>configuration for type</returns>
         public SerializeConfig<TOwner, TType> Printing<TType>()
         {
             return new SerializeConfig<TOwner,TType>(this);
